@@ -2,8 +2,155 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.yizhi.student.dao.StudentInfoDao">
-	
-	
+    <sql id="StudentInfoColumns">
+        a.id,
+        a.student_id,
+        a.student_name,
+        sca.class_name,
+        sm.major_name,
+        sc.college_name,
+        a.certify,
+        a.mail_address,
+
+        a.foreign_lanaguage,
+        a.student_sex
+    </sql>
+
+    <sql id="StudentInfoJoins">
+        left join sys_college sc on sc.id=a.tocollege
+		left join sys_class sca on sca.id=a.class_id
+        left join sys_major sm on sm.id = a.tomajor
+    </sql>
+
+    <insert id="save" parameterType="com.yizhi.student.domain.StudentInfoDO" useGeneratedKeys="true" keyProperty="id">
+        insert into s_student_info
+        (
+            'student_id',
+            'exam_id',
+            'class_id',
+            'student_name',
+            'certify',
+            'mail_address',
+            'foreign_lanaguage',
+            'student_sex',
+            'nation',
+            'political',
+            'card_id',
+            'telephone',
+            'subject_type',
+            'tocollege',
+            'tocampus',
+            'birthplace',
+            'grade',
+            'isstate',
+            'birthday',
+            'note'
+        )
+        values (
+                #{studentId},
+                #{examId},
+                #{classId},
+                #{studentName},
+                #{certify},
+                #{mailAddress},
+                #{foreignLanaguage},
+                #{studentSex},
+                #{nation},
+                #{political},
+                #{cardId},
+                #{telephone},
+                #{subjectType},
+                #{tocollege},
+                #{tocampus},
+                #{birthplace},
+                #{grade},
+                #{isstate},
+                #{birthday},
+                #{note}
+
+               )
+    </insert>
 
 
+    <update id="update" parameterType="com.yizhi.student.domain.StudentInfoDO">
+        update s_student_info
+        <set>
+            <if test="studentId != null">`student_id` = #{studentId}, </if>
+            <if test="examId != null">`exam_id` = #{examId}, </if>
+            <if test="classId != null">`class_id` = #{classId}, </if>
+            <if test="studentName != null">`student_name` = #{studentName}, </if>
+            <if test="certify != null">`certify` = #{certify}, </if>
+            <if test="mailAddress != null">`mail_address` = #{mailAddress}, </if>
+            <if test="foreignLanaguage != null">`foreign_lanaguage` = #{foreignLanaguage}, </if>
+            <if test="studentSex != null">`student_sex` = #{studentSex}, </if>
+            <if test="nation != null">`nation` = #{nation}, </if>
+            <if test="political != null">`political` = #{political}, </if>
+            <if test="cardId != null">`card_id` = #{cardId}, </if>
+            <if test="telephone != null">`telephone` = #{telephone}, </if>
+            <if test="subjectType != null">`subject_type` = #{subjectType}, </if>
+            <if test="tocollege != null">`tocollege` = #{tocollege}, </if>
+            <if test="tocampus != null">`tocampus` = #{tocampus}, </if>
+            <if test="tomajor != null">`tomajor` = #{tomajor}, </if>
+            <if test="birthplace != null">`birthplace` = #{birthplace}, </if>
+            <if test="grade != null">`grade` = #{grade}, </if>
+            <if test="isstate != null">`isstate` = #{isstate}, </if>
+            <if test="birthday != null">`birthday` = #{birthday}, </if>
+            <if test="note != null">`note` = #{note} </if>
+        </set>
+        where id = #{id}
+    </update>
+    <delete id="remove">
+        delete
+        from s_student_info
+        where
+            id = #{id}
+    </delete>
+    <delete id="batchRemove">
+        delete from s_student_info where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+    <select id="list" resultType="com.yizhi.student.domain.StudentInfoDO">
+        select
+            *
+        from s_student_info a
+            <include refid="StudentInfoJoins"/>
+        <where>
+            <if test="id != null and id != ''"> and a.id = #{id} </if>
+            <if test="studentName != null and studentName != ''"> and a.student_name LIKE CONCAT('%',#{studentName},'%') </if>
+            <if test="tocollegeId != null and tocollegeId != ''"> and a.tocollege = #{tocollegeId} </if>
+            <if test="classId != null and classId != ''"> and a.class_id = #{classId} </if>
+            <if test="tomajorId != null and tomajorId != ''"> and a.tomajor = #{tomajorId} </if>
+        </where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+            <otherwise>
+                order by a.id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+    <select id="count" resultType="java.lang.Integer">
+        select count(*) from s_student_info a
+            <include refid="StudentInfoJoins"/>
+        <where>
+            <if test="id != null and id != ''"> and a.id = #{id} </if>
+            <if test="studentName != null and studentName != ''"> and a.student_name LIKE CONCAT('%',#{studentName},'%') </if>
+            <if test="tocollegeId != null and tocollegeId != ''"> and a.tocollege = #{tocollegeId} </if>
+            <if test="classId != null and classId != ''"> and a.class_id = #{classId} </if>
+            <if test="tomajorId != null and tomajorId != ''"> and a.tomajor = #{tomajorId} </if>
+        </where>
+    </select>
+    <select id="get" resultType="com.yizhi.student.domain.StudentInfoDO">
+        select *
+        from s_student_info
+        where id = #{id}
+    </select>
 </mapper>

@@ -46,7 +46,7 @@ public class StudentInfoServiceImpl implements StudentInfoService {
 	}
 	
 	@Override
-	public int update(StudentInfoDO studentInfo){
+	public int 	update(StudentInfoDO studentInfo){
 		return studentInfoDao.update(studentInfo);
 	}
 	

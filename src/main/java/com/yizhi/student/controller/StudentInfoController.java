@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 import com.yizhi.student.domain.StudentInfoDO;
 import com.yizhi.student.service.StudentInfoService;
 
+import javax.annotation.Resource;
+
 /**
  * 生基础信息表
  */
@@ -33,7 +35,6 @@ import com.yizhi.student.service.StudentInfoService;
 @RequestMapping("/student/studentInfo")
 public class StudentInfoController {
 
-	
 
 
 	@Autowired
@@ -48,9 +49,25 @@ public class StudentInfoController {
 	@GetMapping("/list")
 	@RequiresPermissions("student:studentInfo:studentInfo")
 	public PageUtils list(@RequestParam Map<String, Object> params){
+		if (params.get("sort")!=null) {
+			params.put("sort",BeanHump.camelToUnderline(params.get("sort").toString()));
+		}
 
-		return null;
+		Query query = new Query(params);
+		List<StudentInfoDO> classList = studentInfoService.list(query);
+		int total = studentInfoService.count(query);
+		return new PageUtils(classList, total,query.getCurrPage(),query.getPageSize());
+	}
 
+	@Log("学生信息保存")
+	@ResponseBody
+	@PostMapping("/save")
+	@RequiresPermissions("student:studentInfo:save")
+	public R save( StudentInfoDO studentInfoDO){
+		if(studentInfoService.save(studentInfoDO)>0){
+			return R.ok();
+		}
+		return R.error();
 	}
 
 
@@ -62,8 +79,8 @@ public class StudentInfoController {
 	@PostMapping("/update")
 	@RequiresPermissions("student:studentInfo:edit")
 	public R update(StudentInfoDO studentInfo){
-
-		return null;
+		studentInfoService.update(studentInfo);
+		return R.ok();
 	}
 
 	/**
@@ -74,7 +91,8 @@ public class StudentInfoController {
 	@ResponseBody
 	@RequiresPermissions("student:studentInfo:remove")
 	public R remove( Integer id){
-		return null;
+		studentInfoService.remove(id);
+		return R.ok();
 	}
 	
 	/**
@@ -85,8 +103,8 @@ public class StudentInfoController {
 	@ResponseBody
 	@RequiresPermissions("student:studentInfo:batchRemove")
 	public R remove(@RequestParam("ids[]") Integer[] ids){
-
-		return null;
+		studentInfoService.batchRemove(ids);
+		return R.ok();
 	}
 
 
